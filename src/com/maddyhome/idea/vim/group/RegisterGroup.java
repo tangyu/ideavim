@@ -394,6 +394,10 @@ public class RegisterGroup {
         registers.put(key, register);
       }
     }
+    List<Register> oRegisters = Options.getInstance().getRegisters();
+    for (Register reg : oRegisters) {
+      registers.put(reg.getName(), reg);
+    }
   }
 
   @Nullable

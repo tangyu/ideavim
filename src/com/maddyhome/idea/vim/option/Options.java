@@ -21,12 +21,20 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.common.Register;
+
+import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.*;
 
 /**
@@ -91,6 +99,17 @@ public class Options {
       return (ListOption)option;
     }
     return null;
+  }
+
+  /**
+   * @return
+   */
+  public List<Register> getRegisters()
+  {
+    ArrayList<Register> res = new ArrayList<Register>(registers.values());
+    Collections.sort(res, new Register.KeySorter<Register>());
+
+    return res;
   }
 
   /**
@@ -434,6 +453,80 @@ public class Options {
    */
   private Options() {
     createDefaultOptions();
+    loadVimrc();
+  }
+
+  /**
+   * Attempts to load all :set commands from the user's .vimrc file if found
+   */
+  private void loadVimrc() {
+    final String homeDirName = System.getProperty("user.home");
+    if (homeDirName != null) {
+      for (String fileName : VimScriptParser.VIMRC_FILES) {
+        final File file = new File(homeDirName, fileName);
+        if (file.exists()) {
+          try {
+            Long fileLengthLong = file.length();
+            byte[] fileContent = new byte[fileLengthLong.intValue()];
+            FileInputStream inputStream = new FileInputStream(file);
+            inputStream.read(fileContent);
+            inputStream.close();
+            String str = new String(fileContent);
+            String[] strArr = str.split("\n");
+            for( String line : strArr ){
+              if (line.startsWith(":set") || line.startsWith("set")) {
+                final int pos = line.indexOf(' ');
+                parseOptionLine(null, line.substring(pos).trim(), false);
+              }
+              if (line.startsWith(":let") || line.startsWith("let")) {
+                final int pos = line.indexOf(' ');
+                final String letStr = line.substring(pos);
+                final int pos2 = letStr.indexOf('=');
+                char recordRegister = letStr.charAt(pos2 - 1);
+                final String letValue = letStr.substring(pos2 + 1);
+                List<KeyStroke> recordList = new ArrayList<KeyStroke>();
+                for(int i=0;i<letValue.length();i++){
+                  char c = letValue.charAt(i);
+                  KeyStroke keyStroke = null;
+                  switch (c){
+                    case 13://回车
+                      keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+                      break;
+                    case 27://esc
+                      keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+                      break;
+                    case 18://CTRL_R
+                      keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK);
+                      break;
+                    case 127://DELETE
+                      keyStroke = KeyStroke.getKeyStroke( KeyEvent.VK_BACK_SPACE , 0 );
+                      break;
+                    default:
+                      keyStroke = KeyStroke.getKeyStroke( c );
+                  }
+                  recordList.add(keyStroke);
+                  //System.out.println(c);
+                }
+                registers.put(recordRegister, new Register(recordRegister, SelectionType.CHARACTER_WISE, recordList));
+              }
+            }
+            /*
+            final BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+              if (line.startsWith(":set") || line.startsWith("set")) {
+                final int pos = line.indexOf(' ');
+                parseOptionLine(null, line.substring(pos).trim(), false);
+              }
+            }
+            */
+          }
+          catch (Exception ignored) {
+          }
+          break;
+        }
+      }
+    }
   }
 
   /**
@@ -472,6 +565,7 @@ public class Options {
 
   @NotNull private final HashMap<String, Option> options = new HashMap<String, Option>();
   @NotNull private final HashMap<String, Option> abbrevs = new HashMap<String, Option>();
+  @NotNull private HashMap<Character, Register> registers = new HashMap<Character, Register>();
 
   private static Options ourInstance;
 
