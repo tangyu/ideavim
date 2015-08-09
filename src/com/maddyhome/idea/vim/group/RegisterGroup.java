@@ -237,9 +237,11 @@ public class RegisterGroup {
   @Nullable
   public Register getRegister(char r) {
     // Uppercase registers actually get the lowercase register
+    /*
     if (Character.isUpperCase(r)) {
       r = Character.toLowerCase(r);
     }
+    */
     return CLIPBOARD_REGISTERS.contains(r) ? refreshClipboardRegister(r) : registers.get(new Character(r));
   }
 
