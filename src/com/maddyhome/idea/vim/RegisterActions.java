@@ -316,8 +316,10 @@ public class RegisterActions {
     parser.registerAction(MappingMode.NVO, "VimMotionRightTillMatchChar", Command.Type.MOTION,
                           Command.FLAG_MOT_INCLUSIVE | Command.FLAG_ALLOW_DIGRAPH,
                           new Shortcut('t'), Argument.Type.DIGRAPH);
+    /*
     parser.registerAction(MappingMode.NVO, "VimMotionRightWrap", Command.Type.MOTION, Command.FLAG_MOT_EXCLUSIVE,
                           new Shortcut(' '));
+    */
     parser.registerAction(MappingMode.NVO, "VimMotionScrollFirstScreenLine", Command.Type.OTHER_READONLY, new Shortcut[]{
       new Shortcut("zt")
     });
@@ -367,11 +369,13 @@ public class RegisterActions {
                             new Shortcut(new KeyStroke[]{KeyStroke.getKeyStroke('z'), KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)})
                           });
     parser.registerAction(MappingMode.NVO, "VimMotionScrollPageDown", Command.Type.OTHER_READONLY, new Shortcut[]{
+      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE , 0)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0))
     });
     parser.registerAction(MappingMode.NVO, "VimMotionScrollPageUp", Command.Type.OTHER_READONLY, new Shortcut[]{
+      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE , KeyEvent.SHIFT_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_MASK))
@@ -731,6 +735,7 @@ public class RegisterActions {
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0))
     });
     parser.registerAction(MappingMode.I, "VimMotionScrollPageUp", Command.Type.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[]{
+      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.SHIFT_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, KeyEvent.CTRL_MASK)),
@@ -738,6 +743,7 @@ public class RegisterActions {
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, KeyEvent.SHIFT_MASK))
     });
     parser.registerAction(MappingMode.I, "VimMotionScrollPageDown", Command.Type.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[]{
+      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.CTRL_MASK)),
